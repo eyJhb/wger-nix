@@ -1,0 +1,36 @@
+diff --git a/manage.py b/manage.py
+index 873291be6..368de89fe 100644
+--- a/manage.py
++++ b/manage.py
+@@ -2,6 +2,7 @@
+ 
+ # Standard Library
+ import sys
++import os
+ 
+ # Django
+ from django.core.management import execute_from_command_line
+@@ -12,13 +13,20 @@ from wger.tasks import (
+     setup_django_environment,
+ )
+ 
+-
+-if __name__ == '__main__':
++def main():
+     # If user passed the settings flag ignore the default wger settings
+-    if not any('--settings' in s for s in sys.argv):
++    settings_file = os.getenv("SETTINGS")
++
++    if not any('--settings' in s for s in sys.argv) and not settings_file:
+         setup_django_environment(get_path('settings.py'))
+ 
++    if settings_file:
++        setup_django_environment(get_path(settings_file))
++
+     # Alternative to above
+     # os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+ 
+     execute_from_command_line(sys.argv)
++
++if __name__ == '__main__':
++    main()

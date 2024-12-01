@@ -1,23 +1,24 @@
 diff --git a/pyproject.toml b/pyproject.toml
-index f10460b1e..2f63b1c4d 100644
+index f10460b1e..62377bd9c 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -35,7 +35,7 @@ Issues = "https://github.com/wger-project/wger/issues"
+@@ -35,7 +35,8 @@ Issues = "https://github.com/wger-project/wger/issues"
  Changelog = "https://wger.readthedocs.io/en/latest/changelog.html"
-
+ 
  [project.scripts]
 -wger = "wger.__main__:main"
 +wger = "wger.tasks:main"
-
++manage = "wger.manage:main"
+ 
  [tool.setuptools]
  include-package-data = false
-@@ -47,6 +47,9 @@ dependencies = { file = ["requirements.txt"] }
+@@ -47,6 +48,9 @@ dependencies = { file = ["requirements.txt"] }
  [tool.distutils.bdist_wheel]
  universal = 1
-
+ 
 +[tool.hatch.build.targets.wheel.force-include]
 +"wger/settings_global.py" = "wger/settings_global.py"
 +
-
+ 
  [tool.ruff]
  # Exclude a variety of commonly ignored directories.

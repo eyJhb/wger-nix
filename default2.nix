@@ -26,6 +26,7 @@ in python3.pkgs.buildPythonApplication rec {
   patches = [
     ./patches/pyproject.patch
     ./patches/tasks.patch
+    ./patches/manage.patch
   ];
 
   # dependencies = with python3.pkgs; [
@@ -73,6 +74,10 @@ in python3.pkgs.buildPythonApplication rec {
     (python3.pkgs.callPackage ./django-bootstrap-breadcrumbs.nix {})
     psycopg2
   ];
+
+  postPatch = ''
+    cp manage.py wger/manage.py
+  '';
 
   postInstall = ''
     cp -a ${frontend}/static/yarn $out/${python3.sitePackages}/wger/core/static
