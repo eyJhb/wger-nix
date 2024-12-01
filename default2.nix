@@ -2,9 +2,12 @@
   lib,
   python3,
   fetchFromGitHub,
+  callPackage,
 }:
 
-python3.pkgs.buildPythonApplication rec {
+let
+  frontend = callPackage ./frontend.nix {};
+in python3.pkgs.buildPythonApplication rec {
   pname = "wger";
   version = "unstable";
   pyproject = true;
@@ -71,6 +74,10 @@ python3.pkgs.buildPythonApplication rec {
     psycopg2
   ];
 
+  postInstall = ''
+    cp -a ${frontend}/static/yarn $out/${python3.sitePackages}/wger/core/static
+    ls -al $out/${python3.sitePackages}/wger/core/static
+  '';
 
   pythonImportsCheck = [
     "wger"

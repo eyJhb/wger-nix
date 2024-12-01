@@ -5,12 +5,12 @@
   mkYarnPackage,
   fetchYarnDeps,
   sass,
+  stdenv,
+  yarn,
+  fixup-yarn-lock,
 }:
 
-mkYarnPackage rec {
-  pname = "wger";
-  version = "unstable";
-
+let 
   src = fetchFromGitHub {
     owner = "wger-project";
     repo = "wger";
@@ -18,28 +18,40 @@ mkYarnPackage rec {
     hash = "sha256-VuVKgkNp6Omiag72lOn6p51kC/jvApX/kRAPpK95U7w=";
   };
 
-  packageJSON = /state/home/projects/workbench/nix-wger/wger/package.json;
-  # offlineCache = fetchYarnDeps {
-  #   yarnLock = "${src}/yarn.lock";
-  #   hash = "sha256-olRU6ZGh6bpZ/WfwIKeREJRGd3oo7kEffFx8+4+7s5k=";
-  # };
+  offlineCache = fetchYarnDeps {
+    yarnLock = "${src}/yarn.lock";
+    hash = "sha256-olRU6ZGh6bpZ/WfwIKeREJRGd3oo7kEffFx8+4+7s5k=";
+  };
+in 
+stdenv.mkDerivation {
+  pname = "tetrio-plus";
+  version = "1.0.0";
+
+  src = src;
 
   nativeBuildInputs = [
+    yarn
+    fixup-yarn-lock
     sass
   ];
 
-
-  distPhase = "true";
-
   buildPhase = ''
-    ls -al ${src}
-    sass ${src}/wger/core/static/scss/main.scss bootstrap-compiled.css
-    exit 1
-    yarn --offline build
-    find package.json yarn.lock static/css static/js -type f | sort | xargs md5sum > static/dist/sum.md5
+    runHook preBuild
+    export HOME=$(mktemp -d)
+
+    yarn config --offline set yarn-offline-mirror ${offlineCache}
+    fixup-yarn-lock yarn.lock
+    yarn install --offline --frozen-lockfile --ignore-platform --ignore-scripts --no-progress --non-interactive
+
+    sass wger/core/static/scss/main.scss wger/core/static/yarn/bootstrap-compiled.css
+
+    runHook postBuild
   '';
 
-
+  installPhase = ''
+    mkdir -p $out
+    cp -a wger/core/static $out/static
+  '';
 
   meta = {
     description = "";
