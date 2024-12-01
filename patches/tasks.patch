@@ -1,0 +1,35 @@
+diff --git a/wger/tasks.py b/wger/tasks.py
+index b1b4b7c65..50bf95b7c 100644
+--- a/wger/tasks.py
++++ b/wger/tasks.py
+@@ -31,7 +31,7 @@ from django.utils.crypto import get_random_string
+
+ # Third Party
+ import requests
+-from invoke import task
++from invoke import task, Program, Collection
+ from tqdm import tqdm
+
+
+@@ -358,3 +358,20 @@ def database_exists():
+         sys.exit(0)
+     else:
+         return True
++
++def main():
++    ns = Collection(
++        start,
++        bootstrap,
++        create_settings,
++        create_or_reset_admin,
++        migrate_db,
++        load_fixtures,
++        load_online_fixtures,
++    )
++    program = Program(namespace=ns)
++    program.run()
++
++
++if __name__ == "__main__":
++    main()
+
